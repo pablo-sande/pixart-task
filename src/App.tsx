@@ -4,7 +4,7 @@ import { Canvas } from './components/Canvas'
 import { ColorPickCanvas } from './components/ColorPickCanvas'
 import { drawImage } from './utils/canvas-utils'
 import { imageCanvasOptions } from './settings/canvas-settings'
-import imgUrl from './assets/20MB-image.jpg'
+import imgUrl from './assets/2MB-image.jpg'
 import pickerLogo from './assets/IconColorPicker.svg'
 
 function App() {
