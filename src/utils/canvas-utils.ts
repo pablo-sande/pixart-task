@@ -28,7 +28,7 @@ const drawImage = (img:string, canvasToAdaptId?: string) => (ctx: CanvasRenderin
         if (canvasToAdaptId) {
             adaptAuxCanvas(canvasToAdaptId, targetWidth + 100, targetHeight + 100)
         }
-        ctx.drawImage(newImage, 50, 50, imgWidth, imgHeight);
+        ctx.drawImage(newImage, 50, 50, targetWidth, targetHeight);
     }
 }
 
