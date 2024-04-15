@@ -18,13 +18,12 @@ const drawImage = (img:string, canvasToAdaptId?: string) => (ctx: CanvasRenderin
         const imgWidth = newImage.width;
         const imgHeight = newImage.height;
         const dpr = window.devicePixelRatio;
-        const targetWidth = imgWidth * dpr;
-        const targetHeight = imgHeight * dpr;
+        const targetWidth = imgWidth / dpr;
+        const targetHeight = imgHeight / dpr;
 
         if (ctx.canvas.width !== targetWidth + 100 || ctx.canvas.height !== targetHeight + 100) {
             ctx.canvas.width = targetWidth + 100
             ctx.canvas.height = targetHeight + 100
-            ctx.scale(dpr, dpr)
         }
         if (canvasToAdaptId) {
             adaptAuxCanvas(canvasToAdaptId, targetWidth + 100, targetHeight + 100)
