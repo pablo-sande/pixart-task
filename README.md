@@ -24,7 +24,7 @@ This is a simple exercise to demonstrate the use of canvas to create a color pic
 2. Hover the image with the mouse
 3. Click on the desired pixel to pick the color
 4. (Optional) Modify the used image by changing the image path in the `App.js` file. (line 7)
-5. (Optional) Modify the size of the color picker by tweaking the settings in the `src/settings/settings.js` file.
+5. (Optional) Modify the size of the color picker by tweaking the settings in the `src/settings/canvas-settings.js` file.
    **Note:** If you want to change the image or the settings, you will need to either run `pnpm run build` again or run `pnpm run dev` to see the changes in real-time.
 
 ## Performance
