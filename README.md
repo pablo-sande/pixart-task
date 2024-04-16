@@ -10,6 +10,7 @@ This is a simple exercise to demonstrate the use of canvas to create a color pic
 -   JavaScript
 -   Canvas
 -   React
+-   Vite
 
 ## How to run
 
@@ -23,19 +24,20 @@ This is a simple exercise to demonstrate the use of canvas to create a color pic
 1. Click on the color picker button
 2. Hover the image with the mouse
 3. Click on the desired pixel to pick the color
-4. (Optional) Modify the used image by changing the image path in the `App.js` file. (line 7)
-5. (Optional) Modify the size of the color picker by tweaking the settings in the `src/settings/canvas-settings.ts` file.
-   **Note:** If you want to change the image or the settings, you will need to either run `pnpm run build` again or run `pnpm run dev` to see the changes in real-time.
+4. Navigate to [`http://localhost:4173`](http://localhost:5173)
+5. (Optional) Modify the used image by changing the image path in the `App.tsx` file. (line 7)
+6. (Optional) Modify the size of the color picker by tweaking the settings in the `src/settings/canvas-settings.ts` file.
+   **Note:** If you want to change the image or the settings, you will need to either run `pnpm run build` again or run `pnpm run dev` and navigate to [`http://localhost:5173`](http://localhost:5173) to see the changes in real-time.
 
 ## Performance
 
 The performance has been tested with several sized images. For the sake of this exerecise, the canvas size will adapt to the image size so it's easy to test with different canvas resolutions.
-I included 4 different images to test the performance. They can be tested by changing the image path in the `App.js` file. (line 7)
+I included 4 different images to test the performance. They can be tested by changing the image path in the `App.tsx` file. (line 7)
 
--   800KB image: optimal performance
--   2MB image: optimal performance
--   20MB image: very good performance
--   42MB image: the performance starts to decrease but it's still usable
+-   **800KB image**: optimal performance
+-   **2MB image**: optimal performance
+-   **20MB image**: very good performance
+-   **42MB image**: the performance starts to decrease but it's still usable
 
 If I had to optimize further, I would consider:
 
