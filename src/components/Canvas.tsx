@@ -1,5 +1,5 @@
 import { useCanvas } from '../hooks/useCanvas'
-import { ForwardedRef, RefObject, forwardRef } from 'react'
+import { RefObject, forwardRef } from 'react'
 
 export type ContextOptions = {
     context: '2d'

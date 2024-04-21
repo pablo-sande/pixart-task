@@ -1,4 +1,4 @@
-import { cellOffset, cellSize, datePickerCircleWidth, gridSize, halfCellSize, halfGridSize } from "../settings/canvas-settings";
+import { cellOffset, cellSize, datePickerCircleWidth, gridSize, halfCellSize } from "../settings/canvas-settings";
 import { drawCircle, drawGrid } from "../utils/canvas-utils";
 import { optionsPicker } from "../settings/canvas-settings";
 let canvas: OffscreenCanvas | null = null;
