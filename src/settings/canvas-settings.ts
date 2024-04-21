@@ -9,7 +9,7 @@ export const imageCanvasOptions: ContextOptions = {
 export const optionsPicker: ContextOptions = {
     context: '2d',
     alpha: true,
-    willReadFrequently: true,
+    willReadFrequently: false,
 }
 
 // The algorithm could be improved to support more configurations

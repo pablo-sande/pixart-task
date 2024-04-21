@@ -1,137 +1,96 @@
-import { useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import { Canvas } from './Canvas'
+import { rgbToHex } from '../utils/canvas-utils'
 import {
-    drawCircle,
-    rgbToHex,
-    defaultDraw,
-    drawGrid,
-} from '../utils/canvas-utils'
-import {
-    cellOffset,
-    cellSize,
-    datePickerCircleWidth,
     gridSize,
-    halfCellSize,
     halfGridSize,
-    imageCanvasOptions,
     optionsPicker,
 } from '../settings/canvas-settings'
 
 type ColorPickCanvasProps = {
     enabled: boolean
+    imageCanvas: RefObject<HTMLCanvasElement>
     selectColor: (color: string) => void
     setEnabled: (enabled: boolean) => void
+    size: { width: number; height: number }
 }
 
 export const ColorPickCanvas = ({
     enabled,
+    imageCanvas,
     selectColor,
     setEnabled,
+    size,
 }: ColorPickCanvasProps) => {
-    const [imageCanvas, setImageCanvas] =
-        useState<CanvasRenderingContext2D | null>(null)
-    const [draw, setDraw] =
-        useState<(ctx: CanvasRenderingContext2D) => void>(defaultDraw)
+    const [worker, setWorker] = useState<Worker | null>(null)
+    const colorPickerCanvas = useRef<HTMLCanvasElement | null>(null)
 
-    const initializeImageCanvas = () => {
-        setImageCanvas(
-            (
-                document.getElementById('image-canvas') as HTMLCanvasElement
-            )?.getContext(imageCanvasOptions.context, {
-                alpha: imageCanvasOptions.alpha,
-                willReadFrequently: imageCanvasOptions.willReadFrequently,
-            })
-        )
-    }
+    useEffect(() => {
+        if (imageCanvas && imageCanvas.current && colorPickerCanvas.current) {
+            if (!worker) {
+                colorPickerCanvas.current.width = imageCanvas.current.width
+                colorPickerCanvas.current.height = imageCanvas.current.height
+                const offscreen =
+                    colorPickerCanvas.current.transferControlToOffscreen()
+
+                const newWorker = new Worker(
+                    new URL('./offscreen-canvas.ts', import.meta.url),
+                    { type: 'module' }
+                )
+                newWorker.postMessage(
+                    {
+                        canvas: offscreen,
+                    },
+                    [offscreen]
+                )
+                setWorker(newWorker)
+            }
+        }
+        return () => {
+            if (worker) {
+                worker.terminate()
+            }
+        }
+    }, [worker, imageCanvas])
+
+    useEffect(() => {
+        if (!enabled) {
+            cleanCanvas()
+        }
+    }, [enabled])
 
     const handleMouseMove = (
         e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
     ) => {
-        setDraw(() => (ctx: CanvasRenderingContext2D) => {
-            if (!ctx) return
-            if (!imageCanvas) {
-                initializeImageCanvas()
-                return
-            }
-            const rect = ctx.canvas.getBoundingClientRect()
+        if (!imageCanvas.current || !colorPickerCanvas.current) return
+        const rect = colorPickerCanvas.current.getBoundingClientRect()
 
-            // Clear the canvas
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        const x = Math.round(e.clientX - rect.left)
+        const y = Math.round(e.clientY - rect.top)
 
-            // Get the mouse position
-            const x = Math.round(e.clientX - rect.left)
-            const y = Math.round(e.clientY - rect.top)
+        const ctx = imageCanvas.current.getContext('2d')
 
-            // Get the data from the image canvas
-            const data = imageCanvas?.getImageData(
-                x - halfGridSize,
-                y - halfGridSize,
-                gridSize,
-                gridSize
-            )?.data
+        if (!ctx) return
 
-            if (!data) return
+        const data = ctx.getImageData(
+            x - halfGridSize,
+            y - halfGridSize,
+            gridSize,
+            gridSize
+        )?.data
 
-            // Get the center color in hex
-            const centerColor = rgbToHex(
-                imageCanvas?.getImageData(x, y, 1, 1)?.data?.slice(0, 3)
-            )
+        const centerColor = rgbToHex(
+            ctx.getImageData(x, y, 1, 1)?.data?.slice(0, 3)
+        )
 
-            // Draw the grid
-            drawGrid(ctx, data, x, y)
-
-            // Draw the center
-            ctx.strokeStyle = '#000'
-            ctx.strokeRect(
-                cellOffset + x - cellOffset,
-                cellOffset + y - cellOffset,
-                cellSize,
-                cellSize
-            )
-
-            // Draw the text background
-            ctx.font = '15px Arial'
-            ctx.fillStyle = '#ddd'
-            ctx.beginPath()
-            ctx.roundRect(x - 30, y + cellSize + 5, 70, 20, 10)
-            ctx.fill()
-            ctx.closePath()
-            ctx.fillStyle = '#000'
-
-            // Draw the text
-            ctx.fillText(centerColor, x - 25, y + cellSize + 20)
-
-            // Draw the circle
-            const radius = Math.round((gridSize * cellSize + cellSize) / 2)
-            drawCircle(
-                ctx,
-                x + halfCellSize,
-                y + halfCellSize,
-                radius,
+        if (worker) {
+            worker.postMessage({
+                x,
+                y,
+                data,
                 centerColor,
-                datePickerCircleWidth
-            )
-
-            // Draw the outer circle border
-            drawCircle(
-                ctx,
-                x + halfCellSize,
-                y + halfCellSize,
-                radius + Math.ceil(datePickerCircleWidth / 2),
-                '#444',
-                1
-            )
-
-            // Draw the inner circle border
-            drawCircle(
-                ctx,
-                x + halfCellSize,
-                y + halfCellSize,
-                radius - Math.floor(datePickerCircleWidth / 2),
-                '#444',
-                1
-            )
-        })
+            })
+        }
     }
 
     const handleClick = (
@@ -142,19 +101,36 @@ export const ColorPickCanvas = ({
         const y = Math.round(e.clientY - rect.top)
 
         const centerColor = rgbToHex(
-            imageCanvas?.getImageData(x, y, 1, 1)?.data?.slice(0, 3)
+            imageCanvas.current
+                ?.getContext('2d')
+                ?.getImageData(x, y, 1, 1)
+                ?.data?.slice(0, 3)
         )
         selectColor(centerColor)
-        setDraw(() => defaultDraw)
+        if (worker) {
+            worker.postMessage({
+                clear: true,
+            })
+        }
         setEnabled(false)
     }
+
+    const cleanCanvas = () => {
+        if (worker) {
+            worker.postMessage({
+                clear: true,
+            })
+        }
+    }
+
     return (
         <Canvas
+            ref={colorPickerCanvas}
             id="color-picker-canvas"
+            size={size}
             options={optionsPicker}
-            draw={draw}
-            handleClick={enabled ? handleClick : () => defaultDraw}
-            handleMouseMove={enabled ? handleMouseMove : () => defaultDraw}
+            handleClick={enabled ? handleClick : () => {}}
+            handleMouseMove={enabled ? handleMouseMove : () => {}}
             zIndex={2}
         />
     )

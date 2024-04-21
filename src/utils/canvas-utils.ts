@@ -1,17 +1,15 @@
-import { cellOffset, cellSize, gridSize, halfGridSize, optionsPicker, quarterGridSize } from "../settings/canvas-settings"
+import { ContextOptions } from "../components/Canvas"
+import { cellOffset, cellSize, gridSize, halfGridSize, quarterGridSize } from "../settings/canvas-settings"
 
-const defaultDraw = (ctx: CanvasRenderingContext2D) => {
+
+const defaultDrawCanvas = (canvas: HTMLCanvasElement, options: ContextOptions) => {
+    if (!canvas) return
+    const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
     ctx?.beginPath()
-    ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)}
-
-const adaptAuxCanvas = (id: string, w: number, h: number) => {
-    const auxCanvas = document.getElementById(id) as HTMLCanvasElement
-    auxCanvas.width = w
-    auxCanvas.height = h
-    auxCanvas.getContext(optionsPicker.context, { alpha: optionsPicker.alpha, willReadFrequently: optionsPicker.willReadFrequently })
+    ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-const drawImage = (img:string, canvasToAdaptId?: string) => (ctx: CanvasRenderingContext2D) => {
+const drawImage = (img:string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
     const newImage = new Image()
     newImage.src = img
     newImage.onload = () => {
@@ -21,13 +19,8 @@ const drawImage = (img:string, canvasToAdaptId?: string) => (ctx: CanvasRenderin
         const targetWidth = imgWidth / dpr;
         const targetHeight = imgHeight / dpr;
 
-        if (ctx.canvas.width !== targetWidth + 100 || ctx.canvas.height !== targetHeight + 100) {
-            ctx.canvas.width = targetWidth + 100
-            ctx.canvas.height = targetHeight + 100
-        }
-        if (canvasToAdaptId) {
-            adaptAuxCanvas(canvasToAdaptId, targetWidth + 100, targetHeight + 100)
-        }
+        const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
+        if (!ctx) return
         ctx.drawImage(newImage, 50, 50, targetWidth, targetHeight);
     }
 }
@@ -44,13 +37,15 @@ const rgbToHex = (rgb?: Uint8ClampedArray) => {
 }
 
 const drawCircle = (
-    ctx: CanvasRenderingContext2D,
+    canvas: OffscreenCanvas,
     x: number,
     y: number,
     radius: number,
     fill: string,
     strokeWidth: number = 1
 ) => {
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
     ctx.beginPath()
     ctx.strokeStyle = fill
     ctx.lineWidth = strokeWidth
@@ -59,7 +54,9 @@ const drawCircle = (
     ctx.closePath()
 }
 
-const drawGrid = (ctx: CanvasRenderingContext2D, data: Uint8ClampedArray, x:number, y: number) => {
+const drawGrid = (canvas: OffscreenCanvas, data: Uint8ClampedArray, x:number, y: number) => {
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
     ctx.lineWidth = 1
     ctx.strokeStyle = '#ddd'
     let count = 0
@@ -101,4 +98,4 @@ const drawGrid = (ctx: CanvasRenderingContext2D, data: Uint8ClampedArray, x:numb
     }
 }
 
-export { drawImage, drawCircle, rgbToHex, defaultDraw, drawGrid }
+export { drawImage, drawCircle, rgbToHex, defaultDrawCanvas, drawGrid }

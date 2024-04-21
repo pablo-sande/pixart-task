@@ -1,15 +1,14 @@
-import { useEffect, useRef } from "react"
+import { RefObject, useEffect } from "react"
 import { ContextOptions } from "../components/Canvas"
 
-export const useCanvas = ((draw: (ctx: CanvasRenderingContext2D) => void, options: ContextOptions) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null)
+export const useCanvas = ((canvasRef: RefObject<HTMLCanvasElement | null>, options: ContextOptions, draw?: (canvas: HTMLCanvasElement, options: ContextOptions) => 
+    void) => {
 
     useEffect(() => {
-        const canvas = canvasRef.current
-        const ctx = canvas?.getContext(options.context, { alpha: options.alpha, willReadFrequently: options.willReadFrequently})
+        const canvas = canvasRef?.current
         
-        if (canvas && ctx && draw) {
-            draw(ctx)
+        if (canvas && draw) {
+            draw(canvas, options)
         }
     }, [draw, options])
 

@@ -1,18 +1,35 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { Canvas } from './components/Canvas'
-import { ColorPickCanvas } from './components/ColorPickCanvas'
 import { drawImage } from './utils/canvas-utils'
 import { imageCanvasOptions } from './settings/canvas-settings'
-import imgUrl from './assets/2MB-image.jpg'
+import imgUrl from './assets/42MB-image.jpg'
 import pickerLogo from './assets/IconColorPicker.svg'
+import { ColorPickCanvas } from './components/ColorPickCanvas'
 
 function App() {
     const [colorPickerEnabled, setColorPickerEnabled] = useState<boolean>(false)
     const [selectedColor, setSelectedColor] = useState<string>('Select a color')
+    const [size, setSize] = useState<{ width: number; height: number } | null>(
+        null
+    )
+    const imageCanvasRef = useRef(null)
+
+    useEffect(() => {
+        const newImage = new Image()
+        newImage.src = imgUrl
+        newImage.onload = () => {
+            const imgWidth = newImage.width
+            const imgHeight = newImage.height
+            const dpr = window.devicePixelRatio
+            const targetWidth = imgWidth / dpr
+            const targetHeight = imgHeight / dpr
+            setSize({ width: targetWidth + 100, height: targetHeight + 100 })
+        }
+    }, [])
 
     return (
-        <div className="size-full">
+        <main className="size-full">
             <div className="flex flex-row w-90">
                 <img
                     className={`m-8 size-12 bg-white ${
@@ -26,19 +43,29 @@ function App() {
                 <h1 className="text-4xl mt-8 font-bold">{selectedColor}</h1>
             </div>
             <div className="w-full h-5/6">
-                <Canvas
-                    id="image-canvas"
-                    draw={drawImage(imgUrl, 'color-picker-canvas')}
-                    options={imageCanvasOptions}
-                    zIndex={1}
-                />
-                <ColorPickCanvas
-                    enabled={colorPickerEnabled}
-                    selectColor={setSelectedColor}
-                    setEnabled={setColorPickerEnabled}
-                />
+                {size && (
+                    <>
+                        <Canvas
+                            ref={imageCanvasRef}
+                            id="image-canvas"
+                            size={size}
+                            zIndex={1}
+                            options={imageCanvasOptions}
+                            draw={(canvas: HTMLCanvasElement) =>
+                                drawImage(imgUrl, imageCanvasOptions)(canvas)
+                            }
+                        />
+                        <ColorPickCanvas
+                            size={size}
+                            imageCanvas={imageCanvasRef}
+                            enabled={colorPickerEnabled}
+                            selectColor={setSelectedColor}
+                            setEnabled={setColorPickerEnabled}
+                        />
+                    </>
+                )}
             </div>
-        </div>
+        </main>
     )
 }
 

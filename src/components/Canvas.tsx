@@ -1,4 +1,5 @@
 import { useCanvas } from '../hooks/useCanvas'
+import { ForwardedRef, RefObject, forwardRef } from 'react'
 
 export type ContextOptions = {
     context: '2d'
@@ -8,35 +9,44 @@ export type ContextOptions = {
 
 export type CanvasProps = {
     id: string
-    draw: (ctx: CanvasRenderingContext2D) => void
     options: ContextOptions
+    size: { width: number; height: number }
+    zIndex: number
+    draw?: (canvas: HTMLCanvasElement, options: ContextOptions) => void
+    handleClick?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void
     handleMouseMove?: (
         e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
     ) => void
-    handleClick?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void
-    zIndex: number
 }
 
-export const Canvas = ({
-    id,
-    draw,
-    options,
-    handleMouseMove,
-    handleClick,
-    zIndex,
-}: CanvasProps) => {
-    const canvasRef = useCanvas(draw, options)
+export const Canvas = forwardRef(
+    (
+        {
+            id,
+            options,
+            size,
+            zIndex,
+            draw,
+            handleClick,
+            handleMouseMove,
+        }: CanvasProps,
+        ref
+    ) => {
+        useCanvas(ref as RefObject<HTMLCanvasElement>, options, draw)
 
-    return (
-        <canvas
-            id={id}
-            ref={canvasRef}
-            className="m-auto block absolute cursor-none"
-            style={{
-                zIndex: zIndex,
-            }}
-            onMouseMove={handleMouseMove}
-            onClick={handleClick}
-        />
-    )
-}
+        return (
+            <canvas
+                id={id}
+                width={size.width}
+                height={size.height}
+                ref={ref as RefObject<HTMLCanvasElement> | null}
+                className="m-auto block absolute cursor-none"
+                style={{
+                    zIndex: zIndex,
+                }}
+                onMouseMove={handleMouseMove}
+                onClick={handleClick}
+            />
+        )
+    }
+)
