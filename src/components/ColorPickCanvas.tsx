@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useRef } from 'react'
 import { Canvas } from './Canvas'
 import { rgbToHex } from '../utils/canvas-utils'
 import {
@@ -6,6 +6,7 @@ import {
     halfGridSize,
     optionsPicker,
 } from '../settings/canvas-settings'
+import { useWorker } from '../hooks/useWorker'
 
 type ColorPickCanvasProps = {
     enabled: boolean
@@ -22,55 +23,29 @@ export const ColorPickCanvas = ({
     setEnabled,
     size,
 }: ColorPickCanvasProps) => {
-    const [worker, setWorker] = useState<Worker | null>(null)
     const colorPickerCanvas = useRef<HTMLCanvasElement | null>(null)
+    const worker = useWorker(colorPickerCanvas, imageCanvas)
 
-    useEffect(() => {
-        if (imageCanvas && imageCanvas.current && colorPickerCanvas.current) {
-            if (!worker) {
-                colorPickerCanvas.current.width = imageCanvas.current.width
-                colorPickerCanvas.current.height = imageCanvas.current.height
-                const offscreen =
-                    colorPickerCanvas.current.transferControlToOffscreen()
+    const cleanCanvas = () => {
+        if (worker) {
+            worker.postMessage({
+                clear: true,
+            })
+        }
+    }
 
-                const newWorker = new Worker(
-                    new URL('./offscreen-canvas.ts', import.meta.url),
-                    { type: 'module' }
-                )
-                newWorker.postMessage(
-                    {
-                        canvas: offscreen,
-                    },
-                    [offscreen]
-                )
-                setWorker(newWorker)
-            }
-        }
-        return () => {
-            if (worker) {
-                worker.terminate()
-            }
-        }
-    }, [worker, imageCanvas])
-
-    useEffect(() => {
-        if (!enabled) {
-            cleanCanvas()
-        }
-    }, [enabled])
+    if (!enabled) cleanCanvas()
 
     const handleMouseMove = (
         e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
     ) => {
         if (!imageCanvas.current || !colorPickerCanvas.current) return
         const rect = colorPickerCanvas.current.getBoundingClientRect()
-
-        const x = Math.round(e.clientX - rect.left)
-        const y = Math.round(e.clientY - rect.top)
-
         const ctx = imageCanvas.current.getContext('2d')
 
         if (!ctx) return
+        const x = Math.round(e.clientX - rect.left)
+        const y = Math.round(e.clientY - rect.top)
 
         const data = ctx.getImageData(
             x - halfGridSize,
@@ -113,14 +88,6 @@ export const ColorPickCanvas = ({
             })
         }
         setEnabled(false)
-    }
-
-    const cleanCanvas = () => {
-        if (worker) {
-            worker.postMessage({
-                clear: true,
-            })
-        }
     }
 
     return (

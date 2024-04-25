@@ -1,5 +1,5 @@
 import { ContextOptions } from "../components/Canvas"
-import { cellOffset, cellSize, gridSize, halfGridSize, quarterGridSize } from "../settings/canvas-settings"
+import { cellOffset, cellSize, gridSize, halfGridSize } from "../settings/canvas-settings"
 
 
 const defaultDrawCanvas = (canvas: HTMLCanvasElement, options: ContextOptions) => {
@@ -9,20 +9,31 @@ const defaultDrawCanvas = (canvas: HTMLCanvasElement, options: ContextOptions) =
     ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-const drawImage = (img:string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
+export const loadImage = (imgUrl: string) => 
+    new Promise<{ width: number; height: number, img: HTMLImageElement }>((resolve, reject) => {
     const newImage = new Image()
-    newImage.src = img
-    newImage.onload = () => {
-        const imgWidth = newImage.width;
-        const imgHeight = newImage.height;
-        const dpr = window.devicePixelRatio;
-        const targetWidth = imgWidth / dpr;
-        const targetHeight = imgHeight / dpr;
-
-        const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
-        if (!ctx) return
-        ctx.drawImage(newImage, 50, 50, targetWidth, targetHeight);
+    newImage.src = imgUrl
+    try {
+        newImage.onload = () => {
+            const imgWidth = newImage.width
+            const imgHeight = newImage.height
+            const dpr = window.devicePixelRatio
+            const targetWidth = imgWidth / dpr
+            const targetHeight = imgHeight / dpr
+            resolve({ width: targetWidth, height: targetHeight, img: newImage})
+        }
     }
+    catch (err) {
+        reject(err)
+    }
+})
+
+const drawImage = (img:string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
+    const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
+    if (!ctx) return
+    loadImage(img)
+        .then(({ width, height, img }) => ctx.drawImage(img, 50, 50, width, height))
+        .catch(err => console.error(err))
 }
 
 const componentToHex = (c: number) => {
@@ -63,16 +74,6 @@ const drawGrid = (canvas: OffscreenCanvas, data: Uint8ClampedArray, x:number, y:
 
     for (let i = 0; i < gridSize; i++) {
         for (let j = 0; j < gridSize; j++) {
-            // Skip the corners
-            if (
-                i + j < quarterGridSize ||
-                i + j >= 2 * gridSize - quarterGridSize - 1 ||
-                gridSize - i + j >= 2 * gridSize - quarterGridSize ||
-                gridSize - j + i >= 2 * gridSize - quarterGridSize
-            ) {
-                count++
-                continue
-            }
             ctx.fillStyle = `rgb(
                 ${data[count * 4]}, 
                 ${data[count * 4 + 1]}, 

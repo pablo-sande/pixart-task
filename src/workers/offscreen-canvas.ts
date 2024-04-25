@@ -22,6 +22,22 @@ self.onmessage = (e) => {
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.save()
+
+    const radius = Math.round((gridSize * cellSize + cellSize) / 2)
+
+    // Draw the outer circle border
+    drawCircle(
+        canvas,
+        x + halfCellSize,
+        y + halfCellSize,
+        radius + Math.ceil(datePickerCircleWidth / 2),
+        '#444',
+        1
+    )
+    
+    // Clip the outer circle area circle
+    ctx.clip()
 
     // Draw the grid
     drawGrid(canvas, data, x, y)
@@ -48,7 +64,6 @@ self.onmessage = (e) => {
     ctx.fillText(centerColor, x - 25, y + cellSize + 20)
 
     // Draw the circle
-    const radius = Math.round((gridSize * cellSize + cellSize) / 2)
     drawCircle(
         canvas,
         x + halfCellSize,
@@ -56,16 +71,6 @@ self.onmessage = (e) => {
         radius,
         centerColor,
         datePickerCircleWidth
-    )
-
-    // Draw the outer circle border
-    drawCircle(
-        canvas,
-        x + halfCellSize,
-        y + halfCellSize,
-        radius + Math.ceil(datePickerCircleWidth / 2),
-        '#444',
-        1
     )
 
     // Draw the inner circle border
@@ -77,6 +82,8 @@ self.onmessage = (e) => {
         '#444',
         1
     )
+
+    ctx.restore()
 }
 
 

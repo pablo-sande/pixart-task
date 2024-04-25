@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { Canvas } from './components/Canvas'
-import { drawImage } from './utils/canvas-utils'
+import { drawImage, loadImage } from './utils/canvas-utils'
 import { imageCanvasOptions } from './settings/canvas-settings'
-import imgUrl from './assets/42MB-image.jpg'
+import imgUrl from './assets/2MB-image.jpg'
 import pickerLogo from './assets/IconColorPicker.svg'
 import { ColorPickCanvas } from './components/ColorPickCanvas'
 
@@ -16,16 +16,11 @@ function App() {
     const imageCanvasRef = useRef(null)
 
     useEffect(() => {
-        const newImage = new Image()
-        newImage.src = imgUrl
-        newImage.onload = () => {
-            const imgWidth = newImage.width
-            const imgHeight = newImage.height
-            const dpr = window.devicePixelRatio
-            const targetWidth = imgWidth / dpr
-            const targetHeight = imgHeight / dpr
-            setSize({ width: targetWidth + 100, height: targetHeight + 100 })
-        }
+        loadImage(imgUrl)
+            .then(({ width, height }) =>
+                setSize({ width: width + 100, height: height + 100 })
+            )
+            .catch((err) => console.error(err))
     }, [])
 
     return (
