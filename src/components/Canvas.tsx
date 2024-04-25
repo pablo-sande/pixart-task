@@ -9,10 +9,9 @@ export type ContextOptions = {
 
 export type CanvasProps = {
     id: string
-    options: ContextOptions
     size: { width: number; height: number }
     zIndex: number
-    draw?: (canvas: HTMLCanvasElement, options: ContextOptions) => void
+    draw?: (canvas: HTMLCanvasElement) => void
     handleClick?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void
     handleMouseMove?: (
         e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
@@ -21,18 +20,10 @@ export type CanvasProps = {
 
 export const Canvas = forwardRef(
     (
-        {
-            id,
-            options,
-            size,
-            zIndex,
-            draw,
-            handleClick,
-            handleMouseMove,
-        }: CanvasProps,
+        { id, size, zIndex, draw, handleClick, handleMouseMove }: CanvasProps,
         ref
     ) => {
-        useCanvas(ref as RefObject<HTMLCanvasElement>, options, draw)
+        useCanvas(ref as RefObject<HTMLCanvasElement>, draw)
 
         return (
             <canvas

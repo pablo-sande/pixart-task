@@ -4,7 +4,7 @@ import { rgbToHex } from '../utils/canvas-utils'
 import {
     gridSize,
     halfGridSize,
-    optionsPicker,
+    imageCanvasOptions,
 } from '../settings/canvas-settings'
 import { useWorker } from '../hooks/useWorker'
 
@@ -41,7 +41,10 @@ export const ColorPickCanvas = ({
     ) => {
         if (!imageCanvas.current || !colorPickerCanvas.current) return
         const rect = colorPickerCanvas.current.getBoundingClientRect()
-        const ctx = imageCanvas.current.getContext('2d')
+        const ctx = imageCanvas.current.getContext('2d', {
+            alpha: imageCanvasOptions.alpha,
+            willReadFrequently: imageCanvasOptions.willReadFrequently,
+        })
 
         if (!ctx) return
         const x = Math.round(e.clientX - rect.left)
@@ -77,7 +80,10 @@ export const ColorPickCanvas = ({
 
         const centerColor = rgbToHex(
             imageCanvas.current
-                ?.getContext('2d')
+                ?.getContext('2d', {
+                    alpha: imageCanvasOptions.alpha,
+                    willReadFrequently: imageCanvasOptions.willReadFrequently,
+                })
                 ?.getImageData(x, y, 1, 1)
                 ?.data?.slice(0, 3)
         )
@@ -95,7 +101,6 @@ export const ColorPickCanvas = ({
             ref={colorPickerCanvas}
             id="color-picker-canvas"
             size={size}
-            options={optionsPicker}
             handleClick={enabled ? handleClick : () => {}}
             handleMouseMove={enabled ? handleMouseMove : () => {}}
             zIndex={2}

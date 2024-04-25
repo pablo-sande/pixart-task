@@ -45,10 +45,7 @@ function App() {
                             id="image-canvas"
                             size={size}
                             zIndex={1}
-                            options={imageCanvasOptions}
-                            draw={(canvas: HTMLCanvasElement) =>
-                                drawImage(imgUrl, imageCanvasOptions)(canvas)
-                            }
+                            draw={drawImage(imgUrl, imageCanvasOptions)}
                         />
                         <ColorPickCanvas
                             size={size}

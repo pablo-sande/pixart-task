@@ -1,18 +1,16 @@
 import { RefObject, useEffect } from 'react'
-import { ContextOptions } from '../components/Canvas'
 
 export const useCanvas = (
     canvasRef: RefObject<HTMLCanvasElement | null>,
-    options: ContextOptions,
-    draw?: (canvas: HTMLCanvasElement, options: ContextOptions) => void
+    draw?: (canvas: HTMLCanvasElement) => void
 ) => {
     useEffect(() => {
         const canvas = canvasRef?.current
 
         if (canvas && draw) {
-            draw(canvas, options)
+            draw(canvas)
         }
-    }, [draw, options])
+    }, [draw])
 
     return canvasRef
 }

@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from "react"
+import { RefObject, useEffect, useState } from 'react'
 
 export const useWorker = (
     colorPickerCanvas: RefObject<HTMLCanvasElement>,
