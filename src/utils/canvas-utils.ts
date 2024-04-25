@@ -1,40 +1,61 @@
-import { ContextOptions } from "../components/Canvas"
-import { cellOffset, cellSize, gridSize, halfGridSize } from "../settings/canvas-settings"
+import { ContextOptions } from '../components/Canvas'
+import {
+    cellOffset,
+    cellSize,
+    gridSize,
+    halfGridSize,
+} from '../settings/canvas-settings'
 
-
-const defaultDrawCanvas = (canvas: HTMLCanvasElement, options: ContextOptions) => {
+const defaultDrawCanvas = (
+    canvas: HTMLCanvasElement,
+    options: ContextOptions
+) => {
     if (!canvas) return
-    const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
+    const ctx = canvas.getContext('2d', {
+        alpha: options.alpha,
+        willReadFrequently: options.willReadFrequently,
+    })
     ctx?.beginPath()
     ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-export const loadImage = (imgUrl: string) => 
-    new Promise<{ width: number; height: number, img: HTMLImageElement }>((resolve, reject) => {
-    const newImage = new Image()
-    newImage.src = imgUrl
-    try {
-        newImage.onload = () => {
-            const imgWidth = newImage.width
-            const imgHeight = newImage.height
-            const dpr = window.devicePixelRatio
-            const targetWidth = imgWidth / dpr
-            const targetHeight = imgHeight / dpr
-            resolve({ width: targetWidth, height: targetHeight, img: newImage})
+export const loadImage = (imgUrl: string) =>
+    new Promise<{ width: number; height: number; img: HTMLImageElement }>(
+        (resolve, reject) => {
+            const newImage = new Image()
+            newImage.src = imgUrl
+            try {
+                newImage.onload = () => {
+                    const imgWidth = newImage.width
+                    const imgHeight = newImage.height
+                    const dpr = window.devicePixelRatio
+                    const targetWidth = imgWidth / dpr
+                    const targetHeight = imgHeight / dpr
+                    resolve({
+                        width: targetWidth,
+                        height: targetHeight,
+                        img: newImage,
+                    })
+                }
+            } catch (err) {
+                reject(err)
+            }
         }
-    }
-    catch (err) {
-        reject(err)
-    }
-})
+    )
 
-const drawImage = (img:string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
-    const ctx = canvas.getContext('2d', { alpha: options.alpha, willReadFrequently: options.willReadFrequently })
-    if (!ctx) return
-    loadImage(img)
-        .then(({ width, height, img }) => ctx.drawImage(img, 50, 50, width, height))
-        .catch(err => console.error(err))
-}
+const drawImage =
+    (img: string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
+        const ctx = canvas.getContext('2d', {
+            alpha: options.alpha,
+            willReadFrequently: options.willReadFrequently,
+        })
+        if (!ctx) return
+        loadImage(img)
+            .then(({ width, height, img }) =>
+                ctx.drawImage(img, 50, 50, width, height)
+            )
+            .catch((err) => console.error(err))
+    }
 
 const componentToHex = (c: number) => {
     const hex = c.toString(16)
@@ -65,7 +86,12 @@ const drawCircle = (
     ctx.closePath()
 }
 
-const drawGrid = (canvas: OffscreenCanvas, data: Uint8ClampedArray, x:number, y: number) => {
+const drawGrid = (
+    canvas: OffscreenCanvas,
+    data: Uint8ClampedArray,
+    x: number,
+    y: number
+) => {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     ctx.lineWidth = 1

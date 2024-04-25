@@ -1,24 +1,33 @@
-import { cellOffset, cellSize, datePickerCircleWidth, gridSize, halfCellSize } from "../settings/canvas-settings";
-import { drawCircle, drawGrid } from "../utils/canvas-utils";
-import { optionsPicker } from "../settings/canvas-settings";
-let canvas: OffscreenCanvas | null = null;
+import {
+    cellOffset,
+    cellSize,
+    datePickerCircleWidth,
+    gridSize,
+    halfCellSize,
+} from '../settings/canvas-settings'
+import { drawCircle, drawGrid } from '../utils/canvas-utils'
+import { optionsPicker } from '../settings/canvas-settings'
+let canvas: OffscreenCanvas | null = null
 
 self.onmessage = (e) => {
     if (!canvas) {
-        canvas = e.data.canvas as OffscreenCanvas;
-        return;
+        canvas = e.data.canvas as OffscreenCanvas
+        return
     }
-    const ctx = canvas.getContext('2d', { alpha: optionsPicker.alpha, willReadFrequently: optionsPicker.willReadFrequently});
+    const ctx = canvas.getContext('2d', {
+        alpha: optionsPicker.alpha,
+        willReadFrequently: optionsPicker.willReadFrequently,
+    })
     if (!ctx) return
     if (e.data.clear) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         return
     }
 
-    const x = e.data.x;
-    const y = e.data.y;
-    const data = e.data.data;
-    const centerColor = e.data.centerColor;
+    const x = e.data.x
+    const y = e.data.y
+    const data = e.data.data
+    const centerColor = e.data.centerColor
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -35,7 +44,7 @@ self.onmessage = (e) => {
         '#444',
         1
     )
-    
+
     // Clip the outer circle area circle
     ctx.clip()
 
@@ -85,6 +94,5 @@ self.onmessage = (e) => {
 
     ctx.restore()
 }
-
 
 export {}
