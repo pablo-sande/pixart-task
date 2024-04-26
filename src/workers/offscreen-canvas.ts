@@ -14,30 +14,25 @@ self.onmessage = (e) => {
         canvas = e.data.canvas as OffscreenCanvas
         return
     }
-    const ctx = canvas.getContext('2d', {
-        alpha: optionsPicker.alpha,
-        willReadFrequently: optionsPicker.willReadFrequently,
-    })
+    const ctx = canvas.getContext('2d', { ...optionsPicker })
     if (!ctx) return
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
     if (e.data.clear) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
         return
     }
 
-    const x = e.data.x
-    const y = e.data.y
-    const data = e.data.data
-    const centerColor = e.data.centerColor
+    const { x, y, data, centerColor } = e.data
 
     // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.save()
 
     const radius = Math.round((gridSize * cellSize + cellSize) / 2)
 
     // Draw the outer circle border
     drawCircle(
-        canvas,
+        ctx,
         x + halfCellSize,
         y + halfCellSize,
         radius + Math.ceil(datePickerCircleWidth / 2),
@@ -45,11 +40,11 @@ self.onmessage = (e) => {
         1
     )
 
-    // Clip the outer circle area circle
+    // Clip the outer circle's area
     ctx.clip()
 
     // Draw the grid
-    drawGrid(canvas, data, x, y)
+    drawGrid(ctx, data, x, y)
 
     // Draw the center
     ctx.strokeStyle = '#000'
@@ -74,7 +69,7 @@ self.onmessage = (e) => {
 
     // Draw the circle
     drawCircle(
-        canvas,
+        ctx,
         x + halfCellSize,
         y + halfCellSize,
         radius,
@@ -84,7 +79,7 @@ self.onmessage = (e) => {
 
     // Draw the inner circle border
     drawCircle(
-        canvas,
+        ctx,
         x + halfCellSize,
         y + halfCellSize,
         radius - Math.floor(datePickerCircleWidth / 2),

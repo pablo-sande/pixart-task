@@ -1,12 +1,6 @@
 import { useCanvas } from '../hooks/useCanvas'
 import { RefObject, forwardRef } from 'react'
 
-export type ContextOptions = {
-    context: '2d'
-    alpha: boolean
-    willReadFrequently: boolean
-}
-
 export type CanvasProps = {
     id: string
     size: { width: number; height: number }

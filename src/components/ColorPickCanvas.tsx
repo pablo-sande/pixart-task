@@ -28,9 +28,7 @@ export const ColorPickCanvas = ({
 
     const cleanCanvas = () => {
         if (worker) {
-            worker.postMessage({
-                clear: true,
-            })
+            worker.postMessage({ clear: true })
         }
     }
 
@@ -40,13 +38,13 @@ export const ColorPickCanvas = ({
         e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
     ) => {
         if (!imageCanvas.current || !colorPickerCanvas.current) return
+
         const rect = colorPickerCanvas.current.getBoundingClientRect()
         const ctx = imageCanvas.current.getContext('2d', {
-            alpha: imageCanvasOptions.alpha,
-            willReadFrequently: imageCanvasOptions.willReadFrequently,
+            ...imageCanvasOptions,
         })
-
         if (!ctx) return
+
         const x = Math.round(e.clientX - rect.left)
         const y = Math.round(e.clientY - rect.top)
 
@@ -80,19 +78,12 @@ export const ColorPickCanvas = ({
 
         const centerColor = rgbToHex(
             imageCanvas.current
-                ?.getContext('2d', {
-                    alpha: imageCanvasOptions.alpha,
-                    willReadFrequently: imageCanvasOptions.willReadFrequently,
-                })
+                ?.getContext('2d', { ...imageCanvasOptions })
                 ?.getImageData(x, y, 1, 1)
                 ?.data?.slice(0, 3)
         )
         selectColor(centerColor)
-        if (worker) {
-            worker.postMessage({
-                clear: true,
-            })
-        }
+        cleanCanvas()
         setEnabled(false)
     }
 
@@ -101,8 +92,8 @@ export const ColorPickCanvas = ({
             ref={colorPickerCanvas}
             id="color-picker-canvas"
             size={size}
-            handleClick={enabled ? handleClick : () => {}}
-            handleMouseMove={enabled ? handleMouseMove : () => {}}
+            handleClick={enabled ? handleClick : undefined}
+            handleMouseMove={enabled ? handleMouseMove : undefined}
             zIndex={2}
         />
     )

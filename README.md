@@ -36,16 +36,14 @@ I included 4 different images to test the performance. They can be tested by cha
 
 -   **800KB image**: optimal performance
 -   **2MB image**: optimal performance
--   **20MB image**: very good performance
--   **42MB image**: the performance starts to decrease but it's still usable
+-   **20MB image**: very good performance -> since the introduction of the offscreen canvas + Web Worker, the performance is now optimal
+-   **42MB image**: the performance starts to decrease but it's still usable -> since the introduction of the offscreen canvas + Web Worker, the performance is now optimal
 
 If I had to optimize further, I would consider:
 
--   Using a web worker to offload the color picking process from the main thread
 -   Using different sub-canvas to create a grid of smaller canvases
 -   Exploring to use WebGL for better performance
 -   Using a library like `react-konva` to handle the canvas rendering
--   Exploring the offscreen canvas API
 
 ## Other notes
 

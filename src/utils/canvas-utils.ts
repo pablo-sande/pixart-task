@@ -1,36 +1,23 @@
-import { ContextOptions } from '../components/Canvas'
 import {
+    ContextOptions,
     cellOffset,
     cellSize,
     gridSize,
     halfGridSize,
 } from '../settings/canvas-settings'
 
-const defaultDrawCanvas = (
-    canvas: HTMLCanvasElement,
-    options: ContextOptions
-) => {
-    if (!canvas) return
-    const ctx = canvas.getContext('2d', {
-        alpha: options.alpha,
-        willReadFrequently: options.willReadFrequently,
-    })
-    ctx?.beginPath()
-    ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-}
-
 export const loadImage = (imgUrl: string) =>
     new Promise<{ width: number; height: number; img: HTMLImageElement }>(
         (resolve, reject) => {
             const newImage = new Image()
             newImage.src = imgUrl
+
             try {
                 newImage.onload = () => {
-                    const imgWidth = newImage.width
-                    const imgHeight = newImage.height
                     const dpr = window.devicePixelRatio
-                    const targetWidth = imgWidth / dpr
-                    const targetHeight = imgHeight / dpr
+                    const targetWidth = newImage.width / dpr
+                    const targetHeight = newImage.height / dpr
+
                     resolve({
                         width: targetWidth,
                         height: targetHeight,
@@ -45,10 +32,7 @@ export const loadImage = (imgUrl: string) =>
 
 const drawImage =
     (img: string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
-        const ctx = canvas.getContext('2d', {
-            alpha: options.alpha,
-            willReadFrequently: options.willReadFrequently,
-        })
+        const ctx = canvas.getContext('2d', { ...options })
         if (!ctx) return
         loadImage(img)
             .then(({ width, height, img }) =>
@@ -69,15 +53,13 @@ const rgbToHex = (rgb?: Uint8ClampedArray) => {
 }
 
 const drawCircle = (
-    canvas: OffscreenCanvas,
+    ctx: OffscreenCanvasRenderingContext2D,
     x: number,
     y: number,
     radius: number,
     fill: string,
     strokeWidth: number = 1
 ) => {
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
     ctx.beginPath()
     ctx.strokeStyle = fill
     ctx.lineWidth = strokeWidth
@@ -87,13 +69,11 @@ const drawCircle = (
 }
 
 const drawGrid = (
-    canvas: OffscreenCanvas,
+    ctx: OffscreenCanvasRenderingContext2D,
     data: Uint8ClampedArray,
     x: number,
     y: number
 ) => {
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
     ctx.lineWidth = 1
     ctx.strokeStyle = '#ddd'
     let count = 0
@@ -125,4 +105,4 @@ const drawGrid = (
     }
 }
 
-export { drawImage, drawCircle, rgbToHex, defaultDrawCanvas, drawGrid }
+export { drawImage, drawCircle, rgbToHex, drawGrid }

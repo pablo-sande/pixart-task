@@ -18,19 +18,12 @@ export const useWorker = (
                     new URL('../workers/offscreen-canvas.ts', import.meta.url),
                     { type: 'module' }
                 )
-                newWorker.postMessage(
-                    {
-                        canvas: offscreen,
-                    },
-                    [offscreen]
-                )
+                newWorker.postMessage({ canvas: offscreen }, [offscreen])
                 setWorker(newWorker)
             }
         }
         return () => {
-            if (worker) {
-                worker.terminate()
-            }
+            if (worker) worker.terminate()
         }
     }, [worker, imageCanvas])
 
