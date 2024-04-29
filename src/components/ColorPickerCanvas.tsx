@@ -1,14 +1,14 @@
 import { RefObject, useRef } from 'react'
-import { Canvas } from './Canvas'
-import { rgbToHex } from '../utils/canvas-utils'
+import { Canvas } from '@/components/Canvas'
+import { rgbToHex } from '@/utils/canvasUtils'
 import {
     gridSize,
     halfGridSize,
     imageCanvasOptions,
-} from '../settings/canvas-settings'
-import { useWorker } from '../hooks/useWorker'
+} from '@/settings/canvas-settings'
+import { useWorker } from '@/hooks/useWorker'
 
-type ColorPickCanvasProps = {
+type ColorPickerCanvasProps = {
     enabled: boolean
     imageCanvas: RefObject<HTMLCanvasElement>
     selectColor: (color: string) => void
@@ -16,13 +16,13 @@ type ColorPickCanvasProps = {
     size: { width: number; height: number }
 }
 
-export const ColorPickCanvas = ({
+export const ColorPickerCanvas = ({
     enabled,
     imageCanvas,
     selectColor,
     setEnabled,
     size,
-}: ColorPickCanvasProps) => {
+}: ColorPickerCanvasProps) => {
     const colorPickerCanvas = useRef<HTMLCanvasElement | null>(null)
     const worker = useWorker(colorPickerCanvas, imageCanvas)
 

@@ -1,4 +1,4 @@
-import { useCanvas } from '../hooks/useCanvas'
+import { useCanvas } from '@/hooks/useCanvas'
 import { RefObject, forwardRef } from 'react'
 
 export type CanvasProps = {
@@ -22,6 +22,7 @@ export const Canvas = forwardRef(
         return (
             <canvas
                 id={id}
+                data-testid={id}
                 width={size.width}
                 height={size.height}
                 ref={ref as RefObject<HTMLCanvasElement> | null}

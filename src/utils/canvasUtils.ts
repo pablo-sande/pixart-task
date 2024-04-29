@@ -4,36 +4,14 @@ import {
     cellSize,
     gridSize,
     halfGridSize,
-} from '../settings/canvas-settings'
-
-export const loadImage = (imgUrl: string) =>
-    new Promise<{ width: number; height: number; img: HTMLImageElement }>(
-        (resolve, reject) => {
-            const newImage = new Image()
-            newImage.src = imgUrl
-
-            try {
-                newImage.onload = () => {
-                    const dpr = window.devicePixelRatio
-                    const targetWidth = newImage.width / dpr
-                    const targetHeight = newImage.height / dpr
-
-                    resolve({
-                        width: targetWidth,
-                        height: targetHeight,
-                        img: newImage,
-                    })
-                }
-            } catch (err) {
-                reject(err)
-            }
-        }
-    )
+} from '@/settings/canvas-settings'
+import { loadImage } from '@/utils/loadImage'
 
 const drawImage =
     (img: string, options: ContextOptions) => (canvas: HTMLCanvasElement) => {
-        const ctx = canvas.getContext('2d', { ...options })
+        const ctx = canvas.getContext('2d', options) as CanvasRenderingContext2D
         if (!ctx) return
+
         loadImage(img)
             .then(({ width, height, img }) =>
                 ctx.drawImage(img, 50, 50, width, height)

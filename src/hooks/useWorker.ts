@@ -15,7 +15,7 @@ export const useWorker = (
                     colorPickerCanvas.current.transferControlToOffscreen()
 
                 const newWorker = new Worker(
-                    new URL('../workers/offscreen-canvas.ts', import.meta.url),
+                    new URL('../workers/offscreenCanvas.ts', import.meta.url),
                     { type: 'module' }
                 )
                 newWorker.postMessage({ canvas: offscreen }, [offscreen])

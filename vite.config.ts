@@ -1,7 +1,21 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+/// <reference types="vitest" />
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react()],
-});
+    plugins: [react(), tsconfigPaths()],
+    test: {
+        environment: 'happy-dom',
+        globals: true,
+        setupFiles: ['./vitest.setup.ts'],
+        deps: {
+            inline: ['vitest-canvas-mock'],
+        },
+    },
+    resolve: {
+        alias: {
+            '@': '/src',
+        },
+    },
+})
