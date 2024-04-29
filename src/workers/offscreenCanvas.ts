@@ -5,7 +5,7 @@ import {
     gridSize,
     halfCellSize,
 } from '../settings/canvas-settings'
-import { drawCircle, drawGrid } from '../utils/canvas-utils'
+import { drawCircle, drawGrid } from '../utils/canvasUtils'
 import { optionsPicker } from '../settings/canvas-settings'
 let canvas: OffscreenCanvas | null = null
 

@@ -11,6 +11,7 @@ This is a simple exercise to demonstrate the use of canvas to create a color pic
 -   Canvas
 -   React
 -   Vite
+-   Vitest
 
 ## How to run
 
@@ -27,6 +28,7 @@ This is a simple exercise to demonstrate the use of canvas to create a color pic
 4. Navigate to [`http://localhost:4173`](http://localhost:5173)
 5. (Optional) Modify the used image by changing the image path in the `App.tsx` file. (line 7)
 6. (Optional) Modify the size of the color picker by tweaking the settings in the `src/settings/canvas-settings.ts` file.
+7. (Optional) Run `pnpm run test` to run the tests
    **Note:** If you want to change the image or the settings, you will need to either run `pnpm run build` again or run `pnpm run dev` and navigate to [`http://localhost:5173`](http://localhost:5173) to see the changes in real-time.
 
 ## Performance
@@ -47,6 +49,6 @@ If I had to optimize further, I would consider:
 
 ## Other notes
 
-The code structure is very basic, I focused on the functionality and the performance of the color picker given the time constraints. The code can be further optimized and refactored to be more readable and maintainable.
+The code structure, while still basic, has been refactored to be more readable and easier to test.
 
-The code is lacking tests for the same reason as above.
+The code has some basic tests. I used jest-canvas-mock to mock the canvas interactions, but I'd like to explore the possibility of using snapshots to test the canvas rendering.
